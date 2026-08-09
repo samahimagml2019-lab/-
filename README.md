@@ -1,2 +1,1130 @@
 # -
 لعبه تفاعليه 
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>جزيرة الأسرار</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
+}
+
+body{
+    background:#07131b;
+    color:white;
+    font-family:Arial,sans-serif;
+    overflow:hidden;
+    touch-action:none;
+}
+
+#game{
+    position:relative;
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at 50% 40%,#257f78,#123f42 45%,#07131b 100%);
+}
+
+/* SKY */
+.sky{
+    position:absolute;
+    inset:0;
+    background:
+        linear-gradient(#78d8e5 0%,#b9f3df 38%,#45a77b 39%,#166b51 100%);
+}
+
+/* SUN */
+.sun{
+    position:absolute;
+    width:90px;
+    height:90px;
+    background:#fff2a6;
+    border-radius:50%;
+    top:8%;
+    left:8%;
+    box-shadow:0 0 50px #fff2a6;
+}
+
+/* ISLAND */
+.island{
+    position:absolute;
+    width:150vw;
+    height:100vh;
+    left:-25vw;
+    top:12vh;
+    background:
+      radial-gradient(ellipse at center,#59b96e 0%,#2c8755 45%,#15563e 70%,transparent 71%);
+}
+
+/* WATER */
+.water{
+    position:absolute;
+    inset:0;
+    background:
+      repeating-linear-gradient(
+        0deg,
+        rgba(255,255,255,.06) 0px,
+        rgba(255,255,255,.06) 2px,
+        transparent 3px,
+        transparent 22px
+      );
+    opacity:.6;
+}
+
+/* OBJECTS */
+.object{
+    position:absolute;
+    font-size:42px;
+    filter:drop-shadow(0 5px 3px rgba(0,0,0,.35));
+    user-select:none;
+}
+
+#tree1{left:13%;top:36%}
+#tree2{left:75%;top:31%}
+#tree3{left:24%;top:67%}
+#tree4{left:83%;top:69%}
+
+#chest{
+    left:43%;
+    top:43%;
+    font-size:48px;
+}
+
+#gem1{
+    left:27%;
+    top:47%;
+}
+
+#gem2{
+    left:67%;
+    top:54%;
+}
+
+#key{
+    left:54%;
+    top:68%;
+}
+
+#gate{
+    left:45%;
+    top:22%;
+    font-size:65px;
+}
+
+/* PLAYER */
+#player{
+    position:absolute;
+    left:50%;
+    top:58%;
+    transform:translate(-50%,-50%);
+    width:60px;
+    height:80px;
+    z-index:20;
+    text-align:center;
+    font-size:58px;
+    transition:transform .08s linear;
+    filter:drop-shadow(0 8px 4px rgba(0,0,0,.35));
+}
+
+.playerName{
+    position:absolute;
+    top:-22px;
+    left:50%;
+    transform:translateX(-50%);
+    white-space:nowrap;
+    font-size:12px;
+    background:rgba(0,0,0,.45);
+    padding:3px 8px;
+    border-radius:20px;
+}
+
+/* HUD */
+#hud{
+    position:absolute;
+    top:12px;
+    left:12px;
+    right:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    z-index:100;
+}
+
+.stat{
+    background:rgba(0,0,0,.48);
+    backdrop-filter:blur(10px);
+    padding:8px 12px;
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,.15);
+    font-size:14px;
+}
+
+#energy{
+    color:#ff7d9a;
+}
+
+/* LOCATION */
+#location{
+    position:absolute;
+    top:78px;
+    left:50%;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,.38);
+    padding:7px 18px;
+    border-radius:20px;
+    z-index:50;
+    font-size:14px;
+}
+
+/* CONTROLS */
+#controls{
+    position:absolute;
+    bottom:22px;
+    left:20px;
+    right:20px;
+    height:145px;
+    z-index:200;
+}
+
+#joystick{
+    position:absolute;
+    left:0;
+    bottom:0;
+    width:125px;
+    height:125px;
+    border-radius:50%;
+    background:rgba(255,255,255,.13);
+    border:2px solid rgba(255,255,255,.25);
+}
+
+#stick{
+    position:absolute;
+    width:55px;
+    height:55px;
+    border-radius:50%;
+    background:rgba(255,255,255,.45);
+    left:33px;
+    top:33px;
+}
+
+.actionButtons{
+    position:absolute;
+    right:0;
+    bottom:0;
+    display:grid;
+    grid-template-columns:repeat(2,70px);
+    gap:10px;
+}
+
+.btn{
+    width:70px;
+    height:60px;
+    border:none;
+    border-radius:20px;
+    background:rgba(0,0,0,.48);
+    color:white;
+    font-size:25px;
+    border:1px solid rgba(255,255,255,.18);
+}
+
+.btn:active{
+    transform:scale(.9);
+}
+
+/* INVENTORY */
+#inventory{
+    position:absolute;
+    inset:0;
+    background:rgba(3,10,14,.85);
+    backdrop-filter:blur(15px);
+    z-index:500;
+    display:none;
+    padding:30px 20px;
+}
+
+#inventory h2{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.items{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+}
+
+.item{
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:20px;
+    padding:20px;
+    text-align:center;
+    font-size:35px;
+}
+
+.item small{
+    display:block;
+    font-size:13px;
+    margin-top:8px;
+}
+
+.close{
+    position:absolute;
+    top:20px;
+    left:20px;
+    font-size:25px;
+}
+
+/* MESSAGE */
+#message{
+    position:absolute;
+    left:50%;
+    bottom:180px;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,.72);
+    padding:12px 20px;
+    border-radius:25px;
+    z-index:400;
+    display:none;
+    text-align:center;
+    min-width:220px;
+}
+
+/* PUZZLE */
+#puzzle{
+    position:absolute;
+    inset:0;
+    z-index:600;
+    background:rgba(0,0,0,.8);
+    backdrop-filter:blur(12px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.puzzleBox{
+    width:min(400px,95vw);
+    background:#11252a;
+    padding:25px;
+    border-radius:28px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.15);
+}
+
+.colors{
+    display:flex;
+    justify-content:center;
+    gap:15px;
+    margin:25px 0;
+}
+
+.colorBtn{
+    width:65px;
+    height:65px;
+    border-radius:18px;
+    border:3px solid white;
+    font-size:25px;
+}
+
+.red{background:#d84c5b}
+.green{background:#49ad71}
+.blue{background:#4b91d8}
+
+/* START */
+#startScreen{
+    position:absolute;
+    inset:0;
+    z-index:1000;
+    background:
+      linear-gradient(rgba(4,20,25,.4),rgba(4,20,25,.9)),
+      radial-gradient(circle at center,#238b78,#07131b);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:25px;
+}
+
+.startBox{
+    max-width:430px;
+}
+
+.logo{
+    font-size:55px;
+    margin-bottom:10px;
+}
+
+.startBox h1{
+    font-size:32px;
+    margin-bottom:12px;
+}
+
+.startBox p{
+    opacity:.85;
+    line-height:1.7;
+    margin-bottom:25px;
+}
+
+.startBtn{
+    border:none;
+    background:#f5c451;
+    color:#17221f;
+    font-weight:bold;
+    font-size:18px;
+    padding:16px 45px;
+    border-radius:30px;
+}
+
+/* LEVEL UP */
+#levelUp{
+    position:absolute;
+    inset:0;
+    z-index:700;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.45);
+}
+
+.levelBox{
+    background:rgba(15,37,42,.95);
+    padding:35px;
+    border-radius:30px;
+    text-align:center;
+    animation:pop .4s ease;
+}
+
+@keyframes pop{
+    from{transform:scale(.5);opacity:0}
+    to{transform:scale(1);opacity:1}
+}
+
+@keyframes float{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-10px)}
+}
+
+.gem{
+    animation:float 2s infinite ease-in-out;
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+<div class="sky"></div>
+<div class="sun"></div>
+<div class="island"></div>
+<div class="water"></div>
+
+<div class="object" id="tree1">🌴</div>
+<div class="object" id="tree2">🌴</div>
+<div class="object" id="tree3">🌳</div>
+<div class="object" id="tree4">🌳</div>
+
+<div class="object" id="chest">🧰</div>
+
+<div class="object gem" id="gem1">💎</div>
+<div class="object gem" id="gem2">💎</div>
+
+<div class="object" id="key">🔑</div>
+
+<div class="object" id="gate">🚪</div>
+
+<div id="player">
+    👩🏻
+    <div class="playerName">المستكشفة</div>
+</div>
+
+<div id="hud">
+    <div class="stat">❤️ <span id="energy">100</span></div>
+    <div class="stat">⭐ Level <span id="level">1</span></div>
+    <div class="stat">🪙 <span id="coins">0</span></div>
+</div>
+
+<div id="location">🏝️ شاطئ الجزيرة</div>
+
+<div id="message"></div>
+
+<div id="controls">
+
+    <div id="joystick">
+        <div id="stick"></div>
+    </div>
+
+    <div class="actionButtons">
+        <button class="btn" id="actionBtn">👆</button>
+        <button class="btn" id="inventoryBtn">🎒</button>
+        <button class="btn" id="runBtn">🏃</button>
+        <button class="btn" id="mapBtn">🗺️</button>
+    </div>
+
+</div>
+
+<!-- INVENTORY -->
+
+<div id="inventory">
+
+    <div class="close" id="closeInventory">✕</div>
+
+    <h2>🎒 حقيبتي</h2>
+
+    <div class="items">
+
+        <div class="item">
+            🔑
+            <small>مفتاح: <span id="keyCount">0</span></small>
+        </div>
+
+        <div class="item">
+            💎
+            <small>أحجار سحرية: <span id="gemCount">0</span></small>
+        </div>
+
+        <div class="item">
+            🧪
+            <small>جرعة طاقة: 1</small>
+        </div>
+
+        <div class="item">
+            🗺️
+            <small>خريطة الجزيرة</small>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- PUZZLE -->
+
+<div id="puzzle">
+
+    <div class="puzzleBox">
+
+        <h2>🗿 لغز المعبد</h2>
+
+        <p style="margin-top:10px">
+            اضغطي الألوان بالترتيب الصحيح
+        </p>
+
+        <p style="margin-top:10px">
+            🔴 → 🟢 → 🔵
+        </p>
+
+        <div class="colors">
+
+            <button class="colorBtn red" data-color="red">🔴</button>
+
+            <button class="colorBtn green" data-color="green">🟢</button>
+
+            <button class="colorBtn blue" data-color="blue">🔵</button>
+
+        </div>
+
+        <button class="startBtn" id="closePuzzle">
+            إغلاق
+        </button>
+
+    </div>
+
+</div>
+
+<!-- LEVEL UP -->
+
+<div id="levelUp">
+
+    <div class="levelBox">
+
+        <div style="font-size:55px">🎉</div>
+
+        <h2>ممتاز!</h2>
+
+        <p style="margin:15px 0">
+            وصلتِ إلى مستوى جديد
+        </p>
+
+        <button class="startBtn" id="continueBtn">
+            متابعة
+        </button>
+
+    </div>
+
+</div>
+
+<!-- START -->
+
+<div id="startScreen">
+
+    <div class="startBox">
+
+        <div class="logo">🏝️💎</div>
+
+        <h1>جزيرة الأسرار</h1>
+
+        <p>
+            استكشفي الجزيرة، اجمعي الكنوز،
+            حلي الألغاز واكتشفي السر المخفي.
+        </p>
+
+        <button class="startBtn" id="startBtn">
+            🎮 ابدئي المغامرة
+        </button>
+
+    </div>
+
+</div>
+
+</div>
+
+<script>
+
+/* =========================
+   GAME DATA
+========================= */
+
+let gameStarted = false;
+
+let player = {
+    x:50,
+    y:58,
+    speed:0.25,
+    energy:100,
+    coins:0,
+    gems:0,
+    keys:0,
+    xp:0,
+    level:1
+};
+
+let joystick = {
+    active:false,
+    dx:0,
+    dy:0
+};
+
+let run = false;
+
+let puzzleSequence = ["red","green","blue"];
+let puzzleIndex = 0;
+
+let collected = {
+    gem1:false,
+    gem2:false,
+    key:false,
+    chest:false
+};
+
+/* =========================
+   ELEMENTS
+========================= */
+
+const playerEl = document.getElementById("player");
+const coinsEl = document.getElementById("coins");
+const energyEl = document.getElementById("energy");
+const levelEl = document.getElementById("level");
+const gemCountEl = document.getElementById("gemCount");
+const keyCountEl = document.getElementById("keyCount");
+const messageEl = document.getElementById("message");
+
+/* =========================
+   START
+========================= */
+
+document.getElementById("startBtn").onclick = () => {
+
+    document.getElementById("startScreen").style.display="none";
+
+    gameStarted=true;
+
+    showMessage("🌴 استكشفي الجزيرة وابحثي عن الكنوز!");
+
+    saveGame();
+};
+
+/* =========================
+   MESSAGE
+========================= */
+
+let messageTimer;
+
+function showMessage(text){
+
+    messageEl.innerText=text;
+    messageEl.style.display="block";
+
+    clearTimeout(messageTimer);
+
+    messageTimer=setTimeout(()=>{
+        messageEl.style.display="none";
+    },2500);
+}
+
+/* =========================
+   UPDATE PLAYER
+========================= */
+
+function updatePlayer(){
+
+    if(!gameStarted) return;
+
+    let speed = run ? player.speed*2 : player.speed;
+
+    player.x += joystick.dx * speed;
+    player.y += joystick.dy * speed;
+
+    player.x=Math.max(10,Math.min(90,player.x));
+    player.y=Math.max(18,Math.min(82,player.y));
+
+    playerEl.style.left=player.x+"%";
+    playerEl.style.top=player.y+"%";
+
+    if(run && (Math.abs(joystick.dx)>0 || Math.abs(joystick.dy)>0)){
+
+        player.energy-=0.05;
+
+        if(player.energy<0)
+            player.energy=0;
+
+    }else{
+
+        player.energy+=0.015;
+
+        if(player.energy>100)
+            player.energy=100;
+    }
+
+    energyEl.innerText=Math.floor(player.energy);
+
+    checkObjects();
+
+    requestAnimationFrame(updatePlayer);
+}
+
+/* =========================
+   OBJECT DISTANCE
+========================= */
+
+function distance(x,y){
+
+    return Math.sqrt(
+        Math.pow(player.x-x,2)+
+        Math.pow(player.y-y,2)
+    );
+}
+
+/* =========================
+   INTERACTION
+========================= */
+
+function checkObjects(){
+
+    if(distance(27,47)<6 && !collected.gem1){
+
+        collected.gem1=true;
+
+        player.gems++;
+
+        player.coins+=25;
+
+        player.xp+=20;
+
+        document.getElementById("gem1").style.display="none";
+
+        showMessage("💎 حصلتِ على حجر سحري!");
+
+        updateHUD();
+
+        checkLevel();
+        saveGame();
+    }
+
+    if(distance(67,54)<6 && !collected.gem2){
+
+        collected.gem2=true;
+
+        player.gems++;
+
+        player.coins+=25;
+
+        player.xp+=20;
+
+        document.getElementById("gem2").style.display="none";
+
+        showMessage("💎 حجر سحري جديد!");
+
+        updateHUD();
+
+        checkLevel();
+        saveGame();
+    }
+
+    if(distance(54,68)<6 && !collected.key){
+
+        collected.key=true;
+
+        player.keys++;
+
+        player.coins+=30;
+
+        player.xp+=30;
+
+        document.getElementById("key").style.display="none";
+
+        showMessage("🔑 حصلتِ على المفتاح!");
+
+        updateHUD();
+
+        checkLevel();
+        saveGame();
+    }
+
+    if(distance(43,43)<7 && !collected.chest){
+
+        document.getElementById("chest").style.transform="scale(1.15)";
+
+        showMessage("🧰 صندوق قديم! اضغطي 👆 لفتحه.");
+    }
+}
+
+/* =========================
+   ACTION BUTTON
+========================= */
+
+document.getElementById("actionBtn").onclick=()=>{
+
+    if(distance(43,43)<8 && !collected.chest){
+
+        collected.chest=true;
+
+        player.coins+=100;
+
+        player.xp+=50;
+
+        showMessage("🎁 وجدتِ 100 عملة وكنزًا نادرًا!");
+
+        updateHUD();
+
+        checkLevel();
+
+        saveGame();
+
+        return;
+    }
+
+    if(distance(45,22)<10){
+
+        if(player.gems>=2 && player.keys>=1){
+
+            document.getElementById("puzzle").style.display="flex";
+
+            puzzleIndex=0;
+
+        }else{
+
+            showMessage("🔒 تحتاجين إلى حجرين سحريين ومفتاح!");
+
+        }
+
+        return;
+    }
+
+    showMessage("🔍 لا يوجد شيء يمكن استخدامه هنا.");
+};
+
+/* =========================
+   PUZZLE
+========================= */
+
+document.querySelectorAll(".colorBtn").forEach(btn=>{
+
+    btn.addEventListener("click",()=>{
+
+        let color=btn.dataset.color;
+
+        if(color===puzzleSequence[puzzleIndex]){
+
+            puzzleIndex++;
+
+            if(puzzleIndex===puzzleSequence.length){
+
+                document.getElementById("puzzle").style.display="none";
+
+                showMessage("🎉 رائع! فتحتِ بوابة المعبد!");
+
+                player.coins+=200;
+                player.xp+=100;
+
+                checkLevel();
+                updateHUD();
+                saveGame();
+
+                document.getElementById("gate").innerText="🏰";
+
+            }
+
+        }else{
+
+            puzzleIndex=0;
+
+            player.energy-=10;
+
+            showMessage("❌ ترتيب خاطئ! حاولي مرة أخرى.");
+
+            energyEl.innerText=Math.floor(player.energy);
+        }
+
+    });
+
+});
+
+/* =========================
+   CLOSE PUZZLE
+========================= */
+
+document.getElementById("closePuzzle").onclick=()=>{
+
+    document.getElementById("puzzle").style.display="none";
+
+};
+
+/* =========================
+   INVENTORY
+========================= */
+
+document.getElementById("inventoryBtn").onclick=()=>{
+
+    document.getElementById("inventory").style.display="block";
+
+};
+
+document.getElementById("closeInventory").onclick=()=>{
+
+    document.getElementById("inventory").style.display="none";
+
+};
+
+/* =========================
+   RUN
+========================= */
+
+document.getElementById("runBtn").addEventListener("touchstart",(e)=>{
+    e.preventDefault();
+    run=true;
+});
+
+document.getElementById("runBtn").addEventListener("touchend",(e)=>{
+    e.preventDefault();
+    run=false;
+});
+
+document.getElementById("runBtn").addEventListener("mousedown",()=>{
+    run=true;
+});
+
+document.getElementById("runBtn").addEventListener("mouseup",()=>{
+    run=false;
+});
+
+/* =========================
+   JOYSTICK
+========================= */
+
+const joystickEl=document.getElementById("joystick");
+const stick=document.getElementById("stick");
+
+function joystickStart(e){
+
+    joystick.active=true;
+
+    joystickMove(e);
+}
+
+function joystickMove(e){
+
+    if(!joystick.active) return;
+
+    let touch=e.touches ? e.touches[0] : e;
+
+    let rect=joystickEl.getBoundingClientRect();
+
+    let centerX=rect.left+rect.width/2;
+    let centerY=rect.top+rect.height/2;
+
+    let dx=touch.clientX-centerX;
+    let dy=touch.clientY-centerY;
+
+    let max=45;
+
+    let distance=Math.sqrt(dx*dx+dy*dy);
+
+    if(distance>max){
+
+        dx=dx/distance*max;
+        dy=dy/distance*max;
+    }
+
+    stick.style.transform=
+        `translate(${dx}px,${dy}px)`;
+
+    joystick.dx=dx/max;
+    joystick.dy=dy/max;
+}
+
+function joystickEnd(){
+
+    joystick.active=false;
+
+    joystick.dx=0;
+    joystick.dy=0;
+
+    stick.style.transform="translate(0,0)";
+}
+
+joystickEl.addEventListener("touchstart",joystickStart);
+joystickEl.addEventListener("touchmove",joystickMove);
+joystickEl.addEventListener("touchend",joystickEnd);
+
+/* =========================
+   HUD
+========================= */
+
+function updateHUD(){
+
+    coinsEl.innerText=player.coins;
+
+    gemCountEl.innerText=player.gems;
+
+    keyCountEl.innerText=player.keys;
+
+    levelEl.innerText=player.level;
+
+}
+
+/* =========================
+   LEVEL SYSTEM
+========================= */
+
+function checkLevel(){
+
+    let required=player.level*100;
+
+    if(player.xp>=required){
+
+        player.level++;
+
+        player.xp=0;
+
+        document.getElementById("levelUp").style.display="flex";
+
+        updateHUD();
+
+        saveGame();
+
+    }
+
+}
+
+document.getElementById("continueBtn").onclick=()=>{
+
+    document.getElementById("levelUp").style.display="none";
+
+    showMessage("⭐ استمري في المغامرة!");
+
+};
+
+/* =========================
+   MAP
+========================= */
+
+document.getElementById("mapBtn").onclick=()=>{
+
+    showMessage(
+        "🗺️ الشاطئ • 🌳 الغابة • 🗿 المعبد • 🏰 القلعة"
+    );
+
+};
+
+/* =========================
+   SAVE GAME
+========================= */
+
+function saveGame(){
+
+    localStorage.setItem(
+        "mysteryIslandSave",
+        JSON.stringify({
+            player,
+            collected
+        })
+    );
+
+}
+
+/* =========================
+   LOAD GAME
+========================= */
+
+function loadGame(){
+
+    let save=localStorage.getItem("mysteryIslandSave");
+
+    if(!save) return;
+
+    try{
+
+        let data=JSON.parse(save);
+
+        player=data.player;
+        collected=data.collected;
+
+        if(collected.gem1)
+            document.getElementById("gem1").style.display="none";
+
+        if(collected.gem2)
+            document.getElementById("gem2").style.display="none";
+
+        if(collected.key)
+            document.getElementById("key").style.display="none";
+
+        updateHUD();
+
+    }catch(e){
+
+        console.log("Save error");
+
+    }
+
+}
+
+/* =========================
+   AUTO SAVE
+========================= */
+
+setInterval(saveGame,5000);
+
+/* =========================
+   INIT
+========================= */
+
+loadGame();
+
+updateHUD();
+
+updatePlayer();
+
+</script>
+
+</body>
+</html>
